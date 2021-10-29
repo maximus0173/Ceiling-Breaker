@@ -24,6 +24,7 @@
 
 # Visual Studio cache directory
 .vs/
+/.vsconfig
 
 # Gradle cache directory
 .gradle/
@@ -68,3 +69,9 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Third-party asserts
+/[Aa]ssets/3DForge
+/[Aa]ssets/3DForge.meta
+/[Aa]ssets/Plugins/Sirenix
+/[Aa]ssets/Plugins/Sirenix.meta
