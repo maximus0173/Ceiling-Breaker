@@ -42,6 +42,9 @@ public class WallsBuilder : MonoBehaviour
     [SerializeField]
     protected int floors = 10;
 
+    [SerializeField]
+    protected float floorHeight = 0.3f;
+
     [Button(ButtonSizes.Small)]
     public void Build()
     {
@@ -59,6 +62,7 @@ public class WallsBuilder : MonoBehaviour
                 }
                 offset += Vector3.up * this.segmentHeight;
             }
+            offset += Vector3.up * this.floorHeight;
         }
     }
 

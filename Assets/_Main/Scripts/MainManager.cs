@@ -3,23 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class MainManager : MonoBehaviour
 {
 
+    public enum GameState
+    {
+        Initial,
+        Playing,
+        BallLost,
+        GameOver
+    }
+
     public static MainManager Instance { get; private set; }
 
     [SerializeField]
+    protected int lives = 3;
+
+    [SerializeField]
+    protected GameObject ballPrefab;
     protected Ball ball;
     protected Rigidbody ballRb;
 
-    public Text ScoreText;
-    public GameObject GameOverText;
-    
-    private bool m_Started = false;
-    private int m_Points;
-    
-    private bool m_GameOver = false;
+    [SerializeField]
+    protected Paddle paddle;
+
+    public GameState CurrentGameState { get => this.gameState; }
+    public int CurrentUserPoints { get => this.userPoints; }
+
+    public int CurrentLives { get => this.lives; }
+
+    protected GameState gameState = GameState.Initial;
+
+    protected int userPoints;
+
+    public UnityEvent GameStateChanged;
+    public UnityEvent UserPointsChanged;
+    public UnityEvent UserLivesChanged;
 
     private void Awake()
     {
@@ -31,21 +52,16 @@ public class MainManager : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
-    {
-        this.ballRb = this.ball.GetComponent<Rigidbody>();
-    }
-
     private void Update()
     {
-        if (!m_Started)
+        if (this.gameState == GameState.Initial || this.gameState == GameState.BallLost)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 this.StartBall();
             }
         }
-        else if (m_GameOver)
+        else if (this.gameState == GameState.GameOver)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -56,24 +72,49 @@ public class MainManager : MonoBehaviour
 
     protected void StartBall()
     {
-        m_Started = true;
+        Vector3 ballPosition = this.paddle.transform.position + Vector3.up * 1f;
+        GameObject ballGameObject = Instantiate(this.ballPrefab, ballPosition, Quaternion.identity);
+        this.ball = ballGameObject.GetComponent<Ball>();
+        this.ballRb = this.ball.GetComponent<Rigidbody>();
+
         float randomDirection = Random.Range(-1.0f, 1.0f);
         Vector3 forceDir = new Vector3(randomDirection, 1, 0);
         forceDir.Normalize();
 
         this.ball.transform.SetParent(null);
         this.ballRb.AddForce(forceDir * this.ball.MaxSpeed, ForceMode.VelocityChange);
+
+        this.ChangeGameState(GameState.Playing);
     }
 
     public void AddPoint(int point)
     {
-        m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        this.userPoints += point;
+        this.UserPointsChanged.Invoke();
+    }
+
+    public void BallLost()
+    {
+        if (this.lives - 1 > 0)
+        {
+            this.lives--;
+            this.UserLivesChanged.Invoke();
+            this.ChangeGameState(GameState.BallLost);
+        }
+        else
+        {
+            this.GameOver();
+        }
     }
 
     public void GameOver()
     {
-        m_GameOver = true;
-        GameOverText.SetActive(true);
+        this.ChangeGameState(GameState.GameOver);
+    }
+
+    protected void ChangeGameState(GameState newGameState)
+    {
+        this.gameState = newGameState;
+        this.GameStateChanged.Invoke();
     }
 }

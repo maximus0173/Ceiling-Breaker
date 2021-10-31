@@ -83,6 +83,7 @@ public class Bricks : MonoBehaviour
         go.transform.parent = this.transform;
         go.transform.localPosition = position;
         go.transform.localRotation = Quaternion.identity;
+        go.layer = gameObject.layer;
     }
 
 }
