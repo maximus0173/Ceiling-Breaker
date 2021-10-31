@@ -45,32 +45,41 @@ public class WallsBuilder : MonoBehaviour
     [Button(ButtonSizes.Small)]
     public void Build()
     {
-        for (int i = this.transform.childCount - 1; i >= 0; i--)
-        {
-            DestroyImmediate(this.transform.GetChild(i).gameObject);
-        }
+        this.RemoveAllChilds();
         Vector3 offset = Vector3.zero;
         for (int floor = 0; floor < this.floors; floor++)
         {
             for (int floorSegment = 0; floorSegment < this.floorSegments; floorSegment++)
             {
-                WallDef[] availableWallDefs = this.getWallDefsByFloorSegmentAndProbability(floorSegment); 
-                foreach (WallPositionDef wallPositionsDef in this.wallPositionDefs)
+                WallDef[] availableWallDefs = this.GetWallDefsByFloorSegmentAndProbability(floorSegment); 
+                foreach (WallPositionDef wallPositionDef in this.wallPositionDefs)
                 {
                     int prefabIndex = Mathf.RoundToInt(Random.Range(0, availableWallDefs.Length));
-                    GameObject prefab = availableWallDefs[prefabIndex].prefab;
-                    
-                    GameObject go = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
-                    go.transform.position = offset + wallPositionsDef.position;
-                    go.transform.rotation = Quaternion.Euler(wallPositionsDef.rotation);
-                    go.transform.parent = this.transform;
+                    this.InstantiateWall(availableWallDefs[prefabIndex], wallPositionDef, offset);
                 }
                 offset += Vector3.up * this.segmentHeight;
             }
         }
     }
 
-    protected WallDef[] getWallDefsByFloorSegmentAndProbability(int segment)
+    protected void RemoveAllChilds()
+    {
+        for (int i = this.transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(this.transform.GetChild(i).gameObject);
+        }
+    }
+
+    protected void InstantiateWall(WallDef wallDef, WallPositionDef wallPositionDef, Vector3 offset)
+    {
+        GameObject prefab = wallDef.prefab;
+        GameObject go = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+        go.transform.position = offset + wallPositionDef.position;
+        go.transform.rotation = Quaternion.Euler(wallPositionDef.rotation);
+        go.transform.parent = this.transform;
+    }
+
+    protected WallDef[] GetWallDefsByFloorSegmentAndProbability(int segment)
     {
         List<WallDef> segmentWallDefs = this.wallDefs.FindAll(
             wallDef => segment >= wallDef.segmentsRange.x && segment <= wallDef.segmentsRange.y

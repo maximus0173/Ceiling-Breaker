@@ -5,16 +5,22 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-    private Rigidbody m_Rigidbody;
+
+    public float MaxSpeed { get => this.maxSpeed; }
+
+    [SerializeField]
+    protected float maxSpeed = 3f;
+
+    private Rigidbody rb;
 
     void Start()
     {
-        m_Rigidbody = GetComponent<Rigidbody>();
+        this.rb = GetComponent<Rigidbody>();
     }
     
     private void OnCollisionExit(Collision other)
     {
-        var velocity = m_Rigidbody.velocity;
+        var velocity = this.rb.velocity;
         
         //after a collision we accelerate a bit
         velocity += velocity.normalized * 0.01f;
@@ -26,11 +32,16 @@ public class Ball : MonoBehaviour
         }
 
         //max velocity
-        if (velocity.magnitude > 3.0f)
+        if (velocity.magnitude > this.maxSpeed)
         {
-            velocity = velocity.normalized * 3.0f;
+            velocity = velocity.normalized * this.maxSpeed;
         }
 
-        m_Rigidbody.velocity = velocity;
+        this.rb.velocity = velocity;
+    }
+
+    public void AddHorizontalForce(float force)
+    {
+        this.rb.AddForce(Vector3.right * force);
     }
 }
