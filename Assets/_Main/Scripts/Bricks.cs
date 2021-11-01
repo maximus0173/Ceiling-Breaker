@@ -21,6 +21,20 @@ public class Bricks : MonoBehaviour
     [SerializeField]
     protected int linesCount = 2;
 
+    [SerializeField]
+    [ListDrawerSettings()]
+    protected List<Brick> bricks = new List<Brick>();
+
+    public event System.Action OnAllBricksDestroyed;
+
+    private void Start()
+    {
+        foreach (Brick brick in this.bricks)
+        {
+            brick.OnDestroy += HandleBrickDestroy;
+        }
+    }
+
     [Button(ButtonSizes.Small)]
     public void Build()
     {
@@ -38,6 +52,7 @@ public class Bricks : MonoBehaviour
 
     protected void RemoveAllChilds()
     {
+        this.bricks.Clear();
         for (int i = this.transform.childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(this.transform.GetChild(i).gameObject);
@@ -48,7 +63,7 @@ public class Bricks : MonoBehaviour
     {
         List<float> verticalValues = new List<float>();
         float y;
-        y = 0f;
+        y = -verticalOffset;
         for (int i = 0; i < linesCount; i++)
         {
             verticalValues.Add(y);
@@ -84,6 +99,17 @@ public class Bricks : MonoBehaviour
         go.transform.localPosition = position;
         go.transform.localRotation = Quaternion.identity;
         go.layer = gameObject.layer;
+        Brick brick = go.GetComponent<Brick>();
+        this.bricks.Add(brick);
+    }
+
+    protected void HandleBrickDestroy(Brick brick)
+    {
+        this.bricks.Remove(brick);
+        if (this.bricks.Count == 0)
+        {
+            this.OnAllBricksDestroyed?.Invoke();
+        }
     }
 
 }

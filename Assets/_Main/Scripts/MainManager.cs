@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using Sirenix.OdinInspector;
 
 public class MainManager : MonoBehaviour
 {
@@ -29,6 +30,13 @@ public class MainManager : MonoBehaviour
     [SerializeField]
     protected Paddle paddle;
 
+    [SerializeField]
+    protected Camera mainCamera;
+
+    [SerializeField]
+    [ListDrawerSettings(NumberOfItemsPerPage = 10)]
+    protected List<LevelManager> levels = new List<LevelManager>();
+
     public GameState CurrentGameState { get => this.gameState; }
     public int CurrentUserPoints { get => this.userPoints; }
 
@@ -50,6 +58,18 @@ public class MainManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    private void Start()
+    {
+        foreach (LevelManager level in this.levels)
+        {
+            level.OnLevelComplete += HandleLevelComplete;
+        }
+        if (this.levels.Count > 0)
+        {
+            this.levels[0].StartLevel();
+        }
     }
 
     private void Update()
@@ -95,13 +115,13 @@ public class MainManager : MonoBehaviour
 
     public void BallLost()
     {
-        if (this.lives - 1 > 0)
+        if (this.lives - 1 >= 0)
         {
             this.lives--;
             this.UserLivesChanged.Invoke();
             this.ChangeGameState(GameState.BallLost);
         }
-        else
+        if (this.lives <= 0)
         {
             this.GameOver();
         }
@@ -117,4 +137,29 @@ public class MainManager : MonoBehaviour
         this.gameState = newGameState;
         this.GameStateChanged.Invoke();
     }
+
+    public void SetLevels(ICollection<LevelManager> levels)
+    {
+        this.levels.Clear();
+        foreach (LevelManager level in levels)
+        {
+            this.levels.Add(level);
+        }
+    }
+
+    protected void HandleLevelComplete(LevelManager completedLevel)
+    {
+        Destroy(this.ball.gameObject);
+        this.ballRb = null;
+
+        completedLevel.EndLevel();
+        int levelIndex = this.levels.FindIndex(o => o == completedLevel);
+        levelIndex++;
+        if (levelIndex >= 0 && levelIndex < this.levels.Count)
+        {
+            LevelManager nextLevel = this.levels[levelIndex];
+            nextLevel.StartLevel();
+        }
+    }
+
 }
