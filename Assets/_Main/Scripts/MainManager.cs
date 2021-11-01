@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using Cinemachine;
 using Sirenix.OdinInspector;
 
 public class MainManager : MonoBehaviour
@@ -11,6 +12,7 @@ public class MainManager : MonoBehaviour
 
     public enum GameState
     {
+        Intro,
         Initial,
         Playing,
         BallLost,
@@ -28,10 +30,14 @@ public class MainManager : MonoBehaviour
     protected Rigidbody ballRb;
 
     [SerializeField]
+    protected GameObject paddlePrefab;
     protected Paddle paddle;
 
     [SerializeField]
     protected Camera mainCamera;
+
+    [SerializeField]
+    protected CinemachineBlendListCamera introVirtCamera;
 
     [SerializeField]
     [ListDrawerSettings(NumberOfItemsPerPage = 10)]
@@ -42,9 +48,11 @@ public class MainManager : MonoBehaviour
 
     public int CurrentLives { get => this.lives; }
 
-    protected GameState gameState = GameState.Initial;
+    protected GameState gameState = GameState.Intro;
 
     protected int userPoints;
+
+    protected int levelIndex = 0;
 
     public UnityEvent GameStateChanged;
     public UnityEvent UserPointsChanged;
@@ -62,19 +70,19 @@ public class MainManager : MonoBehaviour
 
     private void Start()
     {
-        foreach (LevelManager level in this.levels)
-        {
-            level.OnLevelComplete += HandleLevelComplete;
-        }
-        if (this.levels.Count > 0)
-        {
-            this.levels[0].StartLevel();
-        }
+        this.ChangeGameState(GameState.Intro);
     }
 
     private void Update()
     {
-        if (this.gameState == GameState.Initial || this.gameState == GameState.BallLost)
+        if (this.gameState == GameState.Intro)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                this.StartGame();
+            }
+        }
+        else if (this.gameState == GameState.Initial || this.gameState == GameState.BallLost)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -87,6 +95,23 @@ public class MainManager : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
+        }
+    }
+
+    protected void StartGame()
+    {
+        this.introVirtCamera.gameObject.SetActive(false);
+        this.ChangeGameState(GameState.Initial);
+        foreach (LevelManager level in this.levels)
+        {
+            level.InitLevel();
+            level.OnLevelComplete += HandleLevelComplete;
+        }
+        if (this.levels.Count > this.levelIndex)
+        {
+            LevelManager level = this.levels[this.levelIndex];
+            level.StartLevel();
+            this.CreatePaddle(level.BasePosition);
         }
     }
 
@@ -151,15 +176,33 @@ public class MainManager : MonoBehaviour
     {
         Destroy(this.ball.gameObject);
         this.ballRb = null;
+        this.paddle.DestroyPaddle();
+        StartCoroutine(LevelCompleteTask(completedLevel));
+    }
 
+    IEnumerator LevelCompleteTask(LevelManager completedLevel)
+    {
+        yield return new WaitForSeconds(5f);
         completedLevel.EndLevel();
         int levelIndex = this.levels.FindIndex(o => o == completedLevel);
         levelIndex++;
         if (levelIndex >= 0 && levelIndex < this.levels.Count)
         {
+            this.levelIndex = levelIndex;
             LevelManager nextLevel = this.levels[levelIndex];
             nextLevel.StartLevel();
+
+            this.CreatePaddle(nextLevel.BasePosition);
+            this.gameState = GameState.Initial;
         }
+    }
+
+    protected void CreatePaddle(Vector3 position)
+    {
+        GameObject go = UnityEditor.PrefabUtility.InstantiatePrefab(this.paddlePrefab.gameObject) as GameObject;
+        go.transform.position += position;
+        go.transform.rotation = Quaternion.identity;
+        this.paddle = go.GetComponent<Paddle>();
     }
 
 }

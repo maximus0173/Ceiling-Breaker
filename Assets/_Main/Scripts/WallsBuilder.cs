@@ -96,7 +96,8 @@ public class WallsBuilder : MonoBehaviour
             Light firstPlanLight = this.InstantiateFirstPlanLight(floorObject, levelBasePosition);
             Ceiling ceiling = this.InstantiateCeiling(floorObject, offset);
             CinemachineVirtualCamera virtCamera = this.CreateCamera(floorObject, levelBasePosition);
-            levelManager.Init(bricks, ceiling, firstPlanLight, virtCamera);
+            Transform baseTransform = this.CreateLevelBaseTransform(floorObject, levelBasePosition);
+            levelManager.Init(bricks, ceiling, firstPlanLight, virtCamera, baseTransform);
             levels.Add(levelManager);
 
             offset += Vector3.up * this.ceilingHeight;
@@ -164,6 +165,14 @@ public class WallsBuilder : MonoBehaviour
         go.transform.position += offset;
         CinemachineVirtualCamera virtCamera = go.GetComponent<CinemachineVirtualCamera>();
         return virtCamera;
+    }
+
+    protected Transform CreateLevelBaseTransform(GameObject parent, Vector3 offset)
+    {
+        GameObject go = new GameObject("BaseTransform");
+        go.transform.parent = parent.transform;
+        go.transform.position = offset;
+        return go.transform;
     }
 
     protected WallDef[] GetWallDefsByFloorSegmentAndProbability(int segment)

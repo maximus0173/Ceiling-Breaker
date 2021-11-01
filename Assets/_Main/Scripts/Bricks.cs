@@ -25,6 +25,8 @@ public class Bricks : MonoBehaviour
     [ListDrawerSettings()]
     protected List<Brick> bricks = new List<Brick>();
 
+    protected bool isActive = true;
+
     public event System.Action OnAllBricksDestroyed;
 
     private void Start()
@@ -105,9 +107,12 @@ public class Bricks : MonoBehaviour
 
     protected void HandleBrickDestroy(Brick brick)
     {
+        if (!this.isActive)
+            return;
         this.bricks.Remove(brick);
         if (this.bricks.Count == 0)
         {
+            this.isActive = false;
             this.OnAllBricksDestroyed?.Invoke();
         }
     }

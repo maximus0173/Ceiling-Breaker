@@ -8,8 +8,11 @@ public class DeathZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Destroy(other.gameObject);
-        MainManager.Instance.BallLost();
+        if (other.CompareTag("Ball"))
+        {
+            Destroy(other.gameObject);
+            MainManager.Instance.BallLost();
+        }
     }
 
 }

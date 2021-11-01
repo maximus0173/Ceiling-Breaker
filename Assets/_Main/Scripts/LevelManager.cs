@@ -19,21 +19,31 @@ public class LevelManager : MonoBehaviour
     [SerializeField]
     protected CinemachineVirtualCamera virtCamera;
 
+    [SerializeField]
+    protected Transform baseTransform;
+
+    public Vector3 BasePosition { get => this.baseTransform.position; }
+
     public event System.Action<LevelManager> OnLevelComplete;
 
     private void Start()
     {
-        this.firstPlanLight.gameObject.SetActive(false);
-        this.virtCamera.gameObject.SetActive(false);
         this.bricks.OnAllBricksDestroyed += HandleAllBricksDestroyed;
     }
 
-    public void Init(Bricks bricks, Ceiling ceiling, Light firstPlanLight, CinemachineVirtualCamera virtCamera)
+    public void Init(Bricks bricks, Ceiling ceiling, Light firstPlanLight, CinemachineVirtualCamera virtCamera, Transform baseTransform)
     {
         this.bricks = bricks;
         this.ceiling = ceiling;
         this.firstPlanLight = firstPlanLight;
         this.virtCamera = virtCamera;
+        this.baseTransform = baseTransform;
+    }
+
+    public void InitLevel()
+    {
+        this.firstPlanLight.gameObject.SetActive(false);
+        this.virtCamera.gameObject.SetActive(false);
     }
 
     public void StartLevel()
@@ -50,6 +60,7 @@ public class LevelManager : MonoBehaviour
 
     protected void HandleAllBricksDestroyed()
     {
+        this.ceiling.DestroyCeiling();
         this.OnLevelComplete?.Invoke(this);
     }
 

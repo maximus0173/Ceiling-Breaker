@@ -43,4 +43,9 @@ public class Paddle : MonoBehaviour
             ball.AddHorizontalForce(this.vSpeed);
         }
     }
+
+    public void DestroyPaddle()
+    {
+        Destroy(this.gameObject, 0.2f);
+    }
 }

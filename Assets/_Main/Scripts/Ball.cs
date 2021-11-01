@@ -9,7 +9,10 @@ public class Ball : MonoBehaviour
     public float MaxSpeed { get => this.maxSpeed; }
 
     [SerializeField]
-    protected float maxSpeed = 3f;
+    protected float minSpeed = 4f;
+
+    [SerializeField]
+    protected float maxSpeed = 6f;
 
     private Rigidbody rb;
 
@@ -35,6 +38,10 @@ public class Ball : MonoBehaviour
         if (velocity.magnitude > this.maxSpeed)
         {
             velocity = velocity.normalized * this.maxSpeed;
+        }
+        else if (velocity.magnitude < this.minSpeed)
+        {
+            velocity = velocity.normalized * this.minSpeed;
         }
 
         this.rb.velocity = velocity;
