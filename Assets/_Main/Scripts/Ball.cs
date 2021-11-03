@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,13 +13,30 @@ public class Ball : MonoBehaviour
     [SerializeField]
     protected float maxSpeed = 6f;
 
+    [SerializeField]
+    protected AudioSource audioBounce;
+
     private Rigidbody rb;
+
+    protected Vector3 lastVelocity;
 
     void Start()
     {
         this.rb = GetComponent<Rigidbody>();
     }
-    
+
+    private void Update()
+    {
+        var velocity = this.rb.velocity;
+        if (velocity != this.lastVelocity)
+        {
+            this.audioBounce.Stop();
+            this.audioBounce.pitch = Random.Range(0.9f, 1.1f);
+            this.audioBounce.Play();
+        }
+        this.lastVelocity = velocity;
+    }
+
     private void OnCollisionExit(Collision other)
     {
         var velocity = this.rb.velocity;

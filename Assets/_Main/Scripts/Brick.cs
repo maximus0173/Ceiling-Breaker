@@ -11,6 +11,9 @@ public class Brick : MonoBehaviour
     [SerializeField]
     protected GameObject fractured;
 
+    [SerializeField]
+    protected AudioSource audioExplosion;
+
     public event System.Action<Brick> OnDestroy;
 
     protected bool isActive = true;
@@ -32,6 +35,9 @@ public class Brick : MonoBehaviour
 
             OnDestroy?.Invoke(this);
             MainManager.Instance.AddPoint(1);
+
+            this.audioExplosion.pitch = Random.Range(0.9f, 1.2f);
+            this.audioExplosion.Play();
 
             this.isActive = false;
         }

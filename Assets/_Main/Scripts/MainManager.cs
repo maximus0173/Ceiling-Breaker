@@ -193,7 +193,7 @@ public class MainManager : MonoBehaviour
             nextLevel.StartLevel();
 
             this.CreatePaddle(nextLevel.BasePosition);
-            this.gameState = GameState.Initial;
+            this.ChangeGameState(GameState.Initial);
         }
     }
 

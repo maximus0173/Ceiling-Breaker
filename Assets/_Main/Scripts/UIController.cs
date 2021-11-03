@@ -9,6 +9,8 @@ public class UIController : MonoBehaviour
     [SerializeField]
     protected Text scoreText;
     [SerializeField]
+    protected GameObject pauseMenu;
+    [SerializeField]
     protected GameObject beforeStartText;
     [SerializeField]
     protected GameObject gameOverText;
@@ -26,10 +28,15 @@ public class UIController : MonoBehaviour
         MainManager.GameState gameState = MainManager.Instance.CurrentGameState;
         switch (gameState)
         {
+            case MainManager.GameState.Intro:
+                this.pauseMenu.SetActive(true);
+                break;
             case MainManager.GameState.Initial:
+                this.pauseMenu.SetActive(false);
                 this.beforeStartText.SetActive(true);
                 break;
             case MainManager.GameState.Playing:
+                this.pauseMenu.SetActive(false);
                 this.beforeStartText.SetActive(false);
                 this.livesController.OnLivesChanged();
                 break;

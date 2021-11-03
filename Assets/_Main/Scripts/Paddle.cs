@@ -9,6 +9,9 @@ public class Paddle : MonoBehaviour
     [SerializeField]
     protected float maxMovement = 2.0f;
 
+    [SerializeField]
+    protected AudioSource audioBallBounce;
+
     protected float vSpeed = 0f;
     protected Vector3 lastPosition;
     
@@ -41,6 +44,7 @@ public class Paddle : MonoBehaviour
         {
             Ball ball = collision.collider.GetComponent<Ball>();
             ball.AddHorizontalForce(this.vSpeed);
+            this.audioBallBounce.Play();
         }
     }
 
