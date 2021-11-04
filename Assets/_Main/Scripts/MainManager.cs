@@ -45,18 +45,19 @@ public class MainManager : MonoBehaviour
 
     public GameState CurrentGameState { get => this.gameState; }
     public int CurrentUserPoints { get => this.userPoints; }
+    public bool GamePaused { get => this.isGamePaused; }
 
     public int CurrentLives { get => this.lives; }
 
     protected GameState gameState = GameState.Intro;
-
     protected int userPoints;
-
     protected int levelIndex = 0;
+    protected bool isGamePaused = false;
 
     public UnityEvent GameStateChanged;
     public UnityEvent UserPointsChanged;
     public UnityEvent UserLivesChanged;
+    public UnityEvent GamePausedChanged;
 
     private void Awake()
     {
@@ -70,19 +71,13 @@ public class MainManager : MonoBehaviour
 
     private void Start()
     {
+        Time.timeScale = 1f;
         this.ChangeGameState(GameState.Intro);
     }
 
     private void Update()
     {
-        if (this.gameState == GameState.Intro)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                this.StartGame();
-            }
-        }
-        else if (this.gameState == GameState.Initial || this.gameState == GameState.BallLost)
+        if (this.gameState == GameState.Initial || this.gameState == GameState.BallLost)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -93,13 +88,30 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                ExitGame();
+            }
+        }
+        
+        if (this.gameState != GameState.Intro)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (!this.isGamePaused)
+                {
+                    PauseGame();
+                }
+                else
+                {
+                    UnPauseGame();
+                }
             }
         }
     }
 
-    protected void StartGame()
+    public void StartGame()
     {
+        if (this.gameState != GameState.Intro)
+            return;
         this.introVirtCamera.gameObject.SetActive(false);
         this.ChangeGameState(GameState.Initial);
         foreach (LevelManager level in this.levels)
@@ -113,6 +125,11 @@ public class MainManager : MonoBehaviour
             level.StartLevel();
             this.CreatePaddle(level.BasePosition);
         }
+    }
+
+    public void ExitGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     protected void StartBall()
@@ -172,6 +189,24 @@ public class MainManager : MonoBehaviour
         }
     }
 
+    public void PauseGame()
+    {
+        if (this.gameState == GameState.Intro || this.isGamePaused)
+            return;
+        Time.timeScale = 0f;
+        this.isGamePaused = true;
+        this.GamePausedChanged.Invoke();
+    }
+
+    public void UnPauseGame()
+    {
+        if (this.gameState == GameState.Intro || !this.isGamePaused)
+            return;
+        Time.timeScale = 1f;
+        this.isGamePaused = false;
+        this.GamePausedChanged.Invoke();
+    }
+
     protected void HandleLevelComplete(LevelManager completedLevel)
     {
         Destroy(this.ball.gameObject);
@@ -182,7 +217,7 @@ public class MainManager : MonoBehaviour
 
     IEnumerator LevelCompleteTask(LevelManager completedLevel)
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSecondsRealtime(3f);
         completedLevel.EndLevel();
         int levelIndex = this.levels.FindIndex(o => o == completedLevel);
         levelIndex++;
