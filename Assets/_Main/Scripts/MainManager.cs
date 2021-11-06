@@ -16,7 +16,8 @@ public class MainManager : MonoBehaviour
         Initial,
         Playing,
         BallLost,
-        GameOver
+        GameOver,
+        GameComplete
     }
 
     public static MainManager Instance { get; private set; }
@@ -51,8 +52,17 @@ public class MainManager : MonoBehaviour
 
     protected GameState gameState = GameState.Intro;
     protected int userPoints;
+    [SerializeField]
     protected int levelIndex = 0;
     protected bool isGamePaused = false;
+
+    [SerializeField]
+    protected AudioSource audioMusic1;
+    [SerializeField]
+    protected AudioSource audioMusic2;
+
+    protected float playingMusicBlend = 1f;
+    protected int playingMusic = 1;
 
     public UnityEvent GameStateChanged;
     public UnityEvent UserPointsChanged;
@@ -73,6 +83,7 @@ public class MainManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         this.ChangeGameState(GameState.Intro);
+        StartCoroutine(updateMusic());
     }
 
     private void Update()
@@ -92,7 +103,7 @@ public class MainManager : MonoBehaviour
             }
         }
         
-        if (this.gameState != GameState.Intro)
+        if (this.gameState != GameState.Intro && this.gameState != GameState.GameComplete)
         {
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
             {
@@ -130,6 +141,11 @@ public class MainManager : MonoBehaviour
     public void ExitGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void MainMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 
     protected void StartBall()
@@ -178,6 +194,15 @@ public class MainManager : MonoBehaviour
     {
         this.gameState = newGameState;
         this.GameStateChanged.Invoke();
+        switch (this.gameState)
+        {
+            case GameState.Playing:
+                this.PlayMusic(2);
+                break;
+            default:
+                this.PlayMusic(1);
+                break;
+        }
     }
 
     public void SetLevels(ICollection<LevelManager> levels)
@@ -230,6 +255,10 @@ public class MainManager : MonoBehaviour
             this.CreatePaddle(nextLevel.BasePosition);
             this.ChangeGameState(GameState.Initial);
         }
+        else
+        {
+            this.ChangeGameState(GameState.GameComplete);
+        }
     }
 
     protected void CreatePaddle(Vector3 position)
@@ -238,6 +267,53 @@ public class MainManager : MonoBehaviour
         go.transform.position += position;
         go.transform.rotation = Quaternion.identity;
         this.paddle = go.GetComponent<Paddle>();
+    }
+
+    protected void PlayMusic(int number)
+    {
+        this.playingMusic = number;
+    }
+
+    IEnumerator updateMusic()
+    {
+        while(true)
+        {
+            yield return new WaitForSecondsRealtime(0.2f);
+            if ((float)this.playingMusic > this.playingMusicBlend)
+            {
+                this.playingMusicBlend += 0.1f;
+            }
+            else if ((float)this.playingMusic < this.playingMusicBlend)
+            {
+                this.playingMusicBlend -= 0.1f;
+            }
+            float musicVolume1 = Mathf.Clamp(2 - this.playingMusicBlend, 0f, 1f);
+            float musicVolume2 = Mathf.Clamp(this.playingMusicBlend - 1, 0f, 1f);
+            this.audioMusic1.volume = musicVolume1;
+            this.audioMusic2.volume = musicVolume2;
+            if (musicVolume1 > 0f)
+            {
+                if (!this.audioMusic1.isPlaying)
+                {
+                    this.audioMusic1.Play();
+                }
+            }
+            else
+            {
+                this.audioMusic1.Pause();
+            }
+            if (musicVolume2 > 0f)
+            {
+                if (!this.audioMusic2.isPlaying)
+                {
+                    this.audioMusic2.Play();
+                }
+            }
+            else
+            {
+                this.audioMusic2.Pause();
+            }
+        }
     }
 
 }

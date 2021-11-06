@@ -7,7 +7,14 @@ public class UIController : MonoBehaviour
 {
 
     [SerializeField]
+    protected Text playerText;
+    [SerializeField]
     protected Text scoreText;
+    [SerializeField]
+    protected Text bestScoreText;
+    [SerializeField]
+    protected GameObject gameOverText;
+
     [SerializeField]
     protected GameObject gameMenu;
     [SerializeField]
@@ -15,11 +22,16 @@ public class UIController : MonoBehaviour
     [SerializeField]
     protected OptionsMenu optionsMenu;
     [SerializeField]
+    protected GameObject endMenu;
+    [SerializeField]
     protected GameObject beforeStartText;
     [SerializeField]
-    protected GameObject gameOverText;
-    [SerializeField]
     protected UILivesController livesController;
+
+    private void Start()
+    {
+        this.playerText.text = "Player: " + PlayerManager.Instance.PlayerName;
+    }
 
     public void OnUserPointsChanged()
     {
@@ -29,16 +41,19 @@ public class UIController : MonoBehaviour
 
     public void OnGameStateChanged()
     {
+        this.scoreText.gameObject.SetActive(true);
         this.gameMenu.SetActive(false);
         this.pauseMenu.SetActive(false);
         this.optionsMenu.gameObject.SetActive(false);
         this.beforeStartText.SetActive(false);
         this.gameOverText.SetActive(false);
+        this.endMenu.SetActive(false);
 
         MainManager.GameState gameState = MainManager.Instance.CurrentGameState;
         switch (gameState)
         {
             case MainManager.GameState.Intro:
+                this.scoreText.gameObject.SetActive(false);
                 this.gameMenu.SetActive(true);
                 break;
             case MainManager.GameState.Initial:
@@ -50,6 +65,9 @@ public class UIController : MonoBehaviour
                 break;
             case MainManager.GameState.GameOver:
                 this.gameOverText.SetActive(true);
+                break;
+            case MainManager.GameState.GameComplete:
+                this.endMenu.SetActive(true);
                 break;
         }
         if (gameState == MainManager.GameState.Playing)
@@ -123,7 +141,7 @@ public class UIController : MonoBehaviour
 
     public void MainMenuClicked()
     {
-
+        MainManager.Instance.MainMenu();
     }
 
     public void ExitGameClicked()
