@@ -50,6 +50,8 @@ public class MainManager : MonoBehaviour
 
     public int CurrentLives { get => this.lives; }
 
+    public int CurrentLevel { get => this.levelIndex + 1; }
+
     protected GameState gameState = GameState.Intro;
     protected int userPoints;
     [SerializeField]
@@ -84,6 +86,7 @@ public class MainManager : MonoBehaviour
         Time.timeScale = 1f;
         this.ChangeGameState(GameState.Intro);
         StartCoroutine(updateMusic());
+        this.AddHealingBricks();
     }
 
     private void Update()
@@ -168,7 +171,7 @@ public class MainManager : MonoBehaviour
     public void AddPoint(int point)
     {
         this.userPoints += point;
-        this.UserPointsChanged.Invoke();
+        this.UserPointsChanged?.Invoke();
     }
 
     public void BallLost()
@@ -176,7 +179,7 @@ public class MainManager : MonoBehaviour
         if (this.lives - 1 >= 0)
         {
             this.lives--;
-            this.UserLivesChanged.Invoke();
+            this.UserLivesChanged?.Invoke();
             this.ChangeGameState(GameState.BallLost);
         }
         if (this.lives <= 0)
@@ -187,13 +190,15 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        string playerName = PlayerManager.Instance.PlayerName;
+        DataStorage.Instance.AddUserScore(playerName, this.CurrentUserPoints);
         this.ChangeGameState(GameState.GameOver);
     }
 
     protected void ChangeGameState(GameState newGameState)
     {
         this.gameState = newGameState;
-        this.GameStateChanged.Invoke();
+        this.GameStateChanged?.Invoke();
         switch (this.gameState)
         {
             case GameState.Playing:
@@ -220,7 +225,7 @@ public class MainManager : MonoBehaviour
             return;
         Time.timeScale = 0f;
         this.isGamePaused = true;
-        this.GamePausedChanged.Invoke();
+        this.GamePausedChanged?.Invoke();
     }
 
     public void UnPauseGame()
@@ -229,7 +234,7 @@ public class MainManager : MonoBehaviour
             return;
         Time.timeScale = 1f;
         this.isGamePaused = false;
-        this.GamePausedChanged.Invoke();
+        this.GamePausedChanged?.Invoke();
     }
 
     protected void HandleLevelComplete(LevelManager completedLevel)
@@ -242,7 +247,7 @@ public class MainManager : MonoBehaviour
 
     IEnumerator LevelCompleteTask(LevelManager completedLevel)
     {
-        yield return new WaitForSecondsRealtime(3f);
+        yield return new WaitForSecondsRealtime(2f);
         completedLevel.EndLevel();
         int levelIndex = this.levels.FindIndex(o => o == completedLevel);
         levelIndex++;
@@ -314,6 +319,22 @@ public class MainManager : MonoBehaviour
                 this.audioMusic2.Pause();
             }
         }
+    }
+
+    public void AddLife()
+    {
+        this.lives++;
+        this.UserLivesChanged?.Invoke();
+    }
+
+    protected void AddHealingBricks()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            int levelIndex = Random.Range(1, this.levels.Count - 1);
+            this.levels[levelIndex].AddHealing();
+        }
+
     }
 
 }

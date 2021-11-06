@@ -88,6 +88,8 @@ MonoBehaviour:
   solid: {fileID: 2416231710555722674}
   fractured: {fileID: 650026781348368710}
   audioExplosion: {fileID: 8552698082903632410}
+  isHealing: 0
+  healingPrefab: {fileID: 3089227783456525302, guid: 649c1f6d2b20cba4bb56c49582f185cd, type: 3}
 --- !u!65 &4300533726252255871
 BoxCollider:
   m_ObjectHideFlags: 0

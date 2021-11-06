@@ -64,4 +64,9 @@ public class LevelManager : MonoBehaviour
         this.OnLevelComplete?.Invoke(this);
     }
 
+    public void AddHealing()
+    {
+        this.bricks.AddHealing();
+    }
+
 }

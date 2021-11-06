@@ -14,6 +14,12 @@ public class Brick : MonoBehaviour
     [SerializeField]
     protected AudioSource audioExplosion;
 
+    [SerializeField]
+    protected bool isHealing = true;
+
+    [SerializeField]
+    protected GameObject healingPrefab;
+
     public event System.Action<Brick> OnDestroy;
 
     protected bool isActive = true;
@@ -40,7 +46,17 @@ public class Brick : MonoBehaviour
             this.audioExplosion.Play();
 
             this.isActive = false;
+
+            if (this.isHealing)
+            {
+                Instantiate(this.healingPrefab, this.transform);
+            }
         }
+    }
+
+    public void SetAsHealing()
+    {
+        this.isHealing = true;
     }
 
 }

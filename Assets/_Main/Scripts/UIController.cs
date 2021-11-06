@@ -13,6 +13,8 @@ public class UIController : MonoBehaviour
     [SerializeField]
     protected Text bestScoreText;
     [SerializeField]
+    protected Text levelText;
+    [SerializeField]
     protected GameObject gameOverText;
 
     [SerializeField]
@@ -31,6 +33,8 @@ public class UIController : MonoBehaviour
     private void Start()
     {
         this.playerText.text = "Player: " + PlayerManager.Instance.PlayerName;
+        DataStorage.Instance.ScoresChanged += OnUserScoresChanged;
+        this.UpdateBestScore();
     }
 
     public void OnUserPointsChanged()
@@ -42,6 +46,7 @@ public class UIController : MonoBehaviour
     public void OnGameStateChanged()
     {
         this.scoreText.gameObject.SetActive(true);
+        this.levelText.gameObject.SetActive(true);
         this.gameMenu.SetActive(false);
         this.pauseMenu.SetActive(false);
         this.optionsMenu.gameObject.SetActive(false);
@@ -49,11 +54,14 @@ public class UIController : MonoBehaviour
         this.gameOverText.SetActive(false);
         this.endMenu.SetActive(false);
 
+        this.UpdateLevel();
+
         MainManager.GameState gameState = MainManager.Instance.CurrentGameState;
         switch (gameState)
         {
             case MainManager.GameState.Intro:
                 this.scoreText.gameObject.SetActive(false);
+                this.levelText.gameObject.SetActive(false);
                 this.gameMenu.SetActive(true);
                 break;
             case MainManager.GameState.Initial:
@@ -93,6 +101,11 @@ public class UIController : MonoBehaviour
     public void OnUserLivesChanged()
     {
         this.livesController.OnLivesChanged();
+    }
+
+    public void OnUserScoresChanged()
+    {
+        this.UpdateBestScore();
     }
 
     public void PlayClicked()
@@ -147,6 +160,23 @@ public class UIController : MonoBehaviour
     public void ExitGameClicked()
     {
         MainManager.Instance.ExitGame();
+    }
+
+    protected void UpdateBestScore()
+    {
+        if (this.bestScoreText == null)
+            return;
+        DataStorage.UserScore userScore = DataStorage.Instance.BestScore;
+        this.bestScoreText.text = "Best score: ";
+        if (userScore != null)
+        {
+            this.bestScoreText.text += userScore.userName + ": " + userScore.score;
+        }
+    }
+
+    protected void UpdateLevel()
+    {
+        this.levelText.text = "Level: " + MainManager.Instance.CurrentLevel;
     }
 
 }

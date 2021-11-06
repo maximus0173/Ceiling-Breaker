@@ -11,6 +11,8 @@ public class Paddle : MonoBehaviour
 
     [SerializeField]
     protected AudioSource audioBallBounce;
+    [SerializeField]
+    protected AudioSource audioHealing;
 
     protected float vSpeed = 0f;
     protected Vector3 lastPosition;
@@ -45,6 +47,12 @@ public class Paddle : MonoBehaviour
             Ball ball = collision.collider.GetComponent<Ball>();
             ball.AddHorizontalForce(this.vSpeed);
             this.audioBallBounce.Play();
+        }
+        else if (collision.collider.CompareTag("Healing"))
+        {
+            Destroy(collision.collider.gameObject);
+            MainManager.Instance.AddLife();
+            this.audioHealing.Play();
         }
     }
 

@@ -7,6 +7,12 @@ using Sirenix.OdinInspector;
 public class Bricks : MonoBehaviour
 {
 
+    [System.Serializable]
+    public struct LineDef
+    {
+        public List<int> positions;
+    }
+
     [SerializeField]
     protected GameObject brickPrefab;
 
@@ -15,11 +21,7 @@ public class Bricks : MonoBehaviour
     [SerializeField]
     protected float verticalOffset = 0.3f;
     [SerializeField]
-    protected int leftCount = 6;
-    [SerializeField]
-    protected int rightCount = 6;
-    [SerializeField]
-    protected int linesCount = 2;
+    protected List<LineDef> lines = new List<LineDef>();
 
     [SerializeField]
     [ListDrawerSettings()]
@@ -41,14 +43,16 @@ public class Bricks : MonoBehaviour
     public void Build()
     {
         this.RemoveAllChilds();
+        int lineIndex = 0;
         float[] verticalValues = this.CreateVerticalValues();
-        float[] horizontalValues = this.CreateHorizontalValues();
         foreach (float y in verticalValues)
         {
+            float[] horizontalValues = this.CreateHorizontalValues(lineIndex);
             foreach (float x in horizontalValues)
             {
                 this.InstantiateBrick(new Vector3(x, y, 0f));
             }
+            lineIndex++;
         }
     }
 
@@ -66,7 +70,7 @@ public class Bricks : MonoBehaviour
         List<float> verticalValues = new List<float>();
         float y;
         y = -verticalOffset;
-        for (int i = 0; i < linesCount; i++)
+        for (int i = 0; i < this.lines.Count; i++)
         {
             verticalValues.Add(y);
             y -= verticalOffset;
@@ -74,22 +78,13 @@ public class Bricks : MonoBehaviour
         return verticalValues.ToArray();
     }
 
-    protected float[] CreateHorizontalValues()
+    protected float[] CreateHorizontalValues(int lineIndex)
     {
         List<float> horizontalValues = new List<float>();
-        horizontalValues.Add(0f);
-        float x;
-        x = -horizontalOffset;
-        for (int i = 0; i < leftCount; i++)
+        foreach (int position in this.lines[lineIndex].positions)
         {
+            float x = (float)position * horizontalOffset;
             horizontalValues.Add(x);
-            x -= horizontalOffset;
-        }
-        x = horizontalOffset;
-        for (int i = 0; i < rightCount; i++)
-        {
-            horizontalValues.Add(x);
-            x += horizontalOffset;
         }
         return horizontalValues.ToArray();
     }
@@ -114,6 +109,15 @@ public class Bricks : MonoBehaviour
         {
             this.isActive = false;
             this.OnAllBricksDestroyed?.Invoke();
+        }
+    }
+
+    public void AddHealing()
+    {
+        if (this.bricks.Count > 0)
+        {
+            int index = Random.Range(0, this.bricks.Count - 1);
+            this.bricks[index].SetAsHealing();
         }
     }
 

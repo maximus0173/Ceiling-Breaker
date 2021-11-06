@@ -17,6 +17,9 @@ public class MainMenuUIController : MonoBehaviour
     [SerializeField]
     protected OptionsMenu optionsMenu;
 
+    [SerializeField]
+    protected BestScoresMenu bestScoresMenu;
+
     private void Start()
     {
         this.playerNameInputField.text = PlayerManager.Instance.PlayerName;
@@ -63,8 +66,16 @@ public class MainMenuUIController : MonoBehaviour
         this.gameMenu.SetActive(true);
     }
 
-    public void HightScoresClicked()
+    public void BestScoresClicked()
     {
+        this.gameMenu.SetActive(false);
+        this.bestScoresMenu.gameObject.SetActive(true);
+    }
+
+    public void BestScoresMenuBackClicked()
+    {
+        this.bestScoresMenu.gameObject.SetActive(false);
+        this.gameMenu.SetActive(true);
     }
 
 }
