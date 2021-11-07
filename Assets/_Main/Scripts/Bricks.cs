@@ -39,6 +39,7 @@ public class Bricks : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
     [Button(ButtonSizes.Small)]
     public void Build()
     {
@@ -99,6 +100,7 @@ public class Bricks : MonoBehaviour
         Brick brick = go.GetComponent<Brick>();
         this.bricks.Add(brick);
     }
+#endif
 
     protected void HandleBrickDestroy(Brick brick)
     {

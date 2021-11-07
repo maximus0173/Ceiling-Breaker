@@ -4947,6 +4947,7 @@ MonoBehaviour:
   - {fileID: 974550657}
   - {fileID: 55281079}
   levelIndex: 0
+  healingCount: 6
   audioMusic1: {fileID: 508550011}
   audioMusic2: {fileID: 957626848}
   GameStateChanged:

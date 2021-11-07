@@ -17,6 +17,10 @@ public class DeathZone : MonoBehaviour
             MainManager.Instance.BallLost();
             this.audioLost.Play();
         }
+        else if (other.CompareTag("Brick") || other.CompareTag("Ceiling"))
+        {
+            Destroy(other.gameObject, 2f);
+        }
         else if (other.CompareTag("Healing"))
         {
             Destroy(other.gameObject);

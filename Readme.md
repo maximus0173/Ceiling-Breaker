@@ -1,6 +1,13 @@
 Game prepared for Unity Junior Programmer Course: Data persistence.<br/>
 The game is based on a prototype project from the course, but havely customized and can be treated as stand-alone full game.<br/>
 <br/>
+Play: https://play.unity.com/mg/other/buildwebgl-38<br/>
+<br/>
+Contact:<br/>
+<lu>
+<li>Twitter: https://twitter.com/maximus_173</li>
+</lu>
+<br/>
 To run in Unity additional assets are required:<br/>
 <lu>
 <li>Sirenix: Odin - Inspector and Serializer (https://assetstore.unity.com/packages/tools/utilities/odin-inspector-and-serializer-89041)</li>
@@ -9,8 +16,3 @@ To run in Unity additional assets are required:<br/>
 <li>Unity: TextMesh Pro</li>
 </lu>
 Project Unity version: 2020.3<br/>
-<br/>
-Contact:<br/>
-<lu>
-<li>Twitter: https://twitter.com/maximus_173</li>
-</lu>

@@ -6,8 +6,14 @@
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/
+/[Bb]uildPC/
+/[Bb]uildWebGL/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+/[Cc]apture/
+/connectwebgl.zip
+/ProjectSettings/Packages/com.unity.connect.share/Settings.json
+/webgl_sharing
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data

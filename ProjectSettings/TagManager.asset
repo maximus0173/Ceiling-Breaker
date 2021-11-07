@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ball
   - Healing
+  - Brick
+  - Ceiling
   layers:
   - Default
   - TransparentFX

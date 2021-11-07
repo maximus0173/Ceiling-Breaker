@@ -23,6 +23,9 @@ public class MainMenuUIController : MonoBehaviour
     private void Start()
     {
         this.playerNameInputField.text = PlayerManager.Instance.PlayerName;
+#if UNITY_WEBGL
+        return;
+#endif
     }
 
     public void GameClicked()
@@ -68,6 +71,9 @@ public class MainMenuUIController : MonoBehaviour
 
     public void BestScoresClicked()
     {
+#if UNITY_WEBGL
+        return;
+#endif
         this.gameMenu.SetActive(false);
         this.bestScoresMenu.gameObject.SetActive(true);
     }
@@ -76,6 +82,17 @@ public class MainMenuUIController : MonoBehaviour
     {
         this.bestScoresMenu.gameObject.SetActive(false);
         this.gameMenu.SetActive(true);
+    }
+
+    public void QuitClicked()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#elif (UNITY_WEBGL)
+        return;
+#else
+        Application.Quit();
+#endif
     }
 
 }

@@ -64,6 +64,7 @@ public class WallsBuilder : MonoBehaviour
     [SerializeField]
     protected MainManager mainManager;
 
+#if UNITY_EDITOR
     [Button(ButtonSizes.Small)]
     public void Build()
     {
@@ -190,5 +191,6 @@ public class WallsBuilder : MonoBehaviour
         }
         return availableWallDefs.ToArray();
     }
+#endif
 
 }

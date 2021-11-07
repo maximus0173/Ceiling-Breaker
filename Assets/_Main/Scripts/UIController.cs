@@ -35,6 +35,9 @@ public class UIController : MonoBehaviour
         this.playerText.text = "Player: " + PlayerManager.Instance.PlayerName;
         DataStorage.Instance.ScoresChanged += OnUserScoresChanged;
         this.UpdateBestScore();
+#if UNITY_WEBGL
+        this.bestScoreText.gameObject.SetActive(false);
+#endif
     }
 
     public void OnUserPointsChanged()
@@ -45,6 +48,7 @@ public class UIController : MonoBehaviour
 
     public void OnGameStateChanged()
     {
+        Cursor.visible = false;
         this.scoreText.gameObject.SetActive(true);
         this.levelText.gameObject.SetActive(true);
         this.gameMenu.SetActive(false);
@@ -60,6 +64,7 @@ public class UIController : MonoBehaviour
         switch (gameState)
         {
             case MainManager.GameState.Intro:
+                Cursor.visible = true;
                 this.scoreText.gameObject.SetActive(false);
                 this.levelText.gameObject.SetActive(false);
                 this.gameMenu.SetActive(true);
@@ -75,6 +80,7 @@ public class UIController : MonoBehaviour
                 this.gameOverText.SetActive(true);
                 break;
             case MainManager.GameState.GameComplete:
+                Cursor.visible = true;
                 this.endMenu.SetActive(true);
                 break;
         }
@@ -89,10 +95,12 @@ public class UIController : MonoBehaviour
         bool gamePaused = MainManager.Instance.GamePaused;
         if (gamePaused)
         {
+            Cursor.visible = true;
             this.pauseMenu.SetActive(true);
         }
         else
         {
+            Cursor.visible = false;
             this.pauseMenu.SetActive(false);
             this.optionsMenu.gameObject.SetActive(false);
         }
@@ -116,6 +124,7 @@ public class UIController : MonoBehaviour
     IEnumerator PlayDelayed()
     {
         yield return new WaitForSecondsRealtime(0.2f);
+        Cursor.visible = false;
         MainManager.Instance.StartGame();
     }
 
@@ -126,6 +135,7 @@ public class UIController : MonoBehaviour
 
     public void OptionsClicked()
     {
+        Cursor.visible = true;
         MainManager.GameState gameState = MainManager.Instance.CurrentGameState;
         if (gameState == MainManager.GameState.Intro)
         {

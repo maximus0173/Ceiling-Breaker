@@ -59,6 +59,9 @@ public class MainManager : MonoBehaviour
     protected bool isGamePaused = false;
 
     [SerializeField]
+    protected int healingCount = 6;
+
+    [SerializeField]
     protected AudioSource audioMusic1;
     [SerializeField]
     protected AudioSource audioMusic2;
@@ -268,7 +271,7 @@ public class MainManager : MonoBehaviour
 
     protected void CreatePaddle(Vector3 position)
     {
-        GameObject go = UnityEditor.PrefabUtility.InstantiatePrefab(this.paddlePrefab.gameObject) as GameObject;
+        GameObject go = Instantiate(this.paddlePrefab.gameObject);
         go.transform.position += position;
         go.transform.rotation = Quaternion.identity;
         this.paddle = go.GetComponent<Paddle>();
@@ -329,7 +332,7 @@ public class MainManager : MonoBehaviour
 
     protected void AddHealingBricks()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < this.healingCount; i++)
         {
             int levelIndex = Random.Range(1, this.levels.Count - 1);
             this.levels[levelIndex].AddHealing();

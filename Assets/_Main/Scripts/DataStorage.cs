@@ -49,6 +49,9 @@ public class DataStorage : MonoBehaviour
 
     public void AddUserScore(string userName, int score)
     {
+#if UNITY_WEBGL
+        return;
+#endif
         List<UserScore> bestScores = this.storedData.bestScores;
         UserScore userScore = bestScores.Find(s => s.userName.Equals(userName));
         if (userScore != null && userScore.score > score)
@@ -78,12 +81,18 @@ public class DataStorage : MonoBehaviour
 
     public void Save()
     {
+#if UNITY_WEBGL
+        return;
+#endif
         string json = JsonUtility.ToJson(this.storedData);
         System.IO.File.WriteAllText(this.storedDataFilePath, json);
     }
 
     public void Load()
     {
+#if UNITY_WEBGL
+        return;
+#endif
         if (!System.IO.File.Exists(this.storedDataFilePath))
             return;
         string json = System.IO.File.ReadAllText(this.storedDataFilePath);
